@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>키다리샘 학습 플래너</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #2563eb;
+  --primaryDark: #1e3a8a;
+  --primaryLight: #eff6ff;
+  --green: #16a34a;
+  --greenLight: #f0fdf4;
+  --orange: #ea580c;
+  --orangeLight: #fff7ed;
+  --red: #dc2626;
+  --purple: #7c3aed;
+  --purpleLight: #f5f3ff;
+  --gray50: #f8fafc;
+  --gray100: #f1f5f9;
+  --gray200: #e2e8f0;
+  --gray400: #94a3b8;
+  --gray600: #475569;
+  --gray800: #1e293b;
+  --radius: 14px;
+  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 14px rgba(0,0,0,.05);
+}
+
+body {
+  font-family: 'Malgun Gothic','맑은 고딕', Apple SD Gothic Neo, sans-serif;
+  background: var(--gray100);
+  color: var(--gray800);
+  line-height: 1.65;
+  font-size: 15px;
+}
+
+/* ── 헤더 ── */
+.header {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #3b82f6 100%);
+  color: #fff;
+  padding: 32px 24px 28px;
+  text-align: center;
+}
+.header h1 { font-size: 1.55rem; font-weight: 800; margin-bottom: 4px; }
+.header p { font-size: .85rem; opacity: .8; }
+
+/* ── 컨테이너 ── */
+.container { max-width: 720px; margin: 0 auto; padding: 20px 16px 120px; }
+
+/* ── 카드 ── */
+.card {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px 20px;
+  margin-bottom: 16px;
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1.5px solid var(--gray200);
+}
+.card-head .badge {
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: .72rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: .3px;
+}
+.card-head h2 { font-size: 1.02rem; font-weight: 700; color: var(--primaryDark); }
+.card-desc { font-size: .84rem; color: var(--gray600); margin-bottom: 14px; line-height: 1.6; }
+
+/* ── 입력 ── */
+.field { margin-bottom: 12px; }
+.field:last-child { margin-bottom: 0; }
+.field label {
+  display: block;
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--gray600);
+  margin-bottom: 4px;
+}
+.field input, .field textarea, .field select {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1.5px solid var(--gray200);
+  border-radius: 8px;
+  font: inherit;
+  font-size: .88rem;
+  background: var(--gray50);
+  color: var(--gray800);
+  transition: border-color .15s;
+}
+.field input:focus, .field textarea:focus, .field select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: #fff;
+}
+.field textarea { resize: vertical; min-height: 64px; }
+
+/* ── 주차 선택 ── */
+.week-selector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.week-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 6px;
+  border: 1.5px solid var(--gray200);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+  transition: all .15s;
+}
+.week-btn:hover { border-color: var(--primary); }
+.week-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.week-btn .wk-name {
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--gray800);
+}
+.week-btn .wk-date {
+  font-size: .68rem;
+  color: var(--gray400);
+}
+.week-btn.active .wk-name,
+.week-btn.active .wk-date {
+  color: #fff;
+}
+
+/* ── 과목 탭 ── */
+.subject-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.subject-tab {
+  padding: 10px 4px;
+  border: 2px solid var(--gray200);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: .82rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: all .15s;
+}
+.subject-tab:hover { transform: translateY(-1px); }
+.subject-tab.active { color: #fff; transform: scale(1.03); }
+.tab-korean.active { background: #2563eb; border-color: #2563eb; }
+.tab-english.active { background: #7c3aed; border-color: #7c3aed; }
+.tab-math.active { background: #ea580c; border-color: #ea580c; }
+.tab-social.active { background: #16a34a; border-color: #16a34a; }
+.tab-science.active { background: #0891b2; border-color: #0891b2; }
+
+/* ── 과목 패널 ── */
+.subject-panel { display: none; animation: fadeIn .3s ease; }
+.subject-panel.active { display: block; }
+
+.plan-section {
+  background: var(--gray50);
+  border: 1.5px solid var(--gray200);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.plan-section h3 {
+  font-size: .88rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── 요일별 체크 ── */
+.day-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.day-box {
+  border: 1.5px solid var(--gray200);
+  border-radius: 10px;
+  padding: 10px 6px;
+  text-align: center;
+  background: #fff;
+  transition: all .2s;
+  cursor: pointer;
+}
+.day-box .day-label {
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--gray600);
+  margin-bottom: 6px;
+}
+.day-box .day-check {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--gray200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  font-size: .9rem;
+  transition: all .2s;
+}
+.day-box.checked { border-color: var(--green); background: var(--greenLight); }
+.day-box.checked .day-check {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+/* ── 성취도 바 ── */
+.progress-bar-wrap { margin-bottom: 14px; }
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: .78rem;
+  color: var(--gray600);
+  margin-bottom: 5px;
+}
+.progress-track {
+  background: var(--gray200);
+  border-radius: 99px;
+  height: 10px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width .4s;
+  width: 0%;
+}
+.fill-blue { background: linear-gradient(90deg, #2563eb, #3b82f6); }
+.fill-purple { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+.fill-orange { background: linear-gradient(90deg, #ea580c, #f97316); }
+.fill-green { background: linear-gradient(90deg, #16a34a, #4ade80); }
+.fill-cyan { background: linear-gradient(90deg, #0891b2, #22d3ee); }
+.fill-total { background: linear-gradient(90deg, #1e3a8a, #2563eb, #16a34a); }
+
+/* ── 전체 요약 ── */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.summary-item {
+  text-align: center;
+  padding: 14px 6px;
+  border-radius: 10px;
+  background: var(--gray50);
+  border: 1.5px solid var(--gray200);
+}
+.summary-item .s-label { font-size: .75rem; color: var(--gray600); font-weight: 600; margin-bottom: 4px; }
+.summary-item .s-value { font-size: 1.3rem; font-weight: 800; }
+.s-korean { color: #2563eb; }
+.s-english { color: #7c3aed; }
+.s-math { color: #ea580c; }
+.s-social { color: #16a34a; }
+.s-science { color: #0891b2; }
+
+/* ── 성찰 ── */
+.reflect-box {
+  background: #fffdf5;
+  border: 1.5px solid #f0e6c8;
+  border-radius: 10px;
+  padding: 16px;
+}
+.reflect-box h3 {
+  font-size: .88rem;
+  font-weight: 700;
+  color: #854d0e;
+  margin-bottom: 10px;
+}
+
+/* ── 하단 바 ── */
+.action-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #fff;
+  border-top: 1.5px solid var(--gray200);
+  padding: 12px 16px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  box-shadow: 0 -4px 16px rgba(0,0,0,.06);
+  z-index: 100;
+}
+.btn {
+  padding: 11px 22px;
+  border: none;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 700;
+  font-size: .85rem;
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn-gray { background: var(--gray200); color: var(--gray600); }
+.btn-gray:hover { background: #cbd5e1; }
+.btn-blue { background: var(--primary); color: #fff; }
+.btn-blue:hover { background: var(--primaryDark); }
+.btn-submit { background: #16a34a; color: #fff; }
+.btn-submit:hover { background: #15803d; }
+.btn-submit:disabled { background: #94a3b8; cursor: not-allowed; }
+
+/* ── 토스트 ── */
+.toast {
+  position: fixed; top: 18px; right: 18px;
+  background: var(--green); color: #fff;
+  padding: 9px 18px; border-radius: 99px;
+  font-size: .82rem; font-weight: 700;
+  opacity: 0; transform: translateY(-6px);
+  transition: opacity .25s, transform .25s; z-index: 500;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── 반응형 ── */
+@media (max-width: 600px) {
+  .week-selector { grid-template-columns: repeat(3, 1fr); }
+  .subject-tabs { grid-template-columns: repeat(5, 1fr); font-size: .75rem; }
+  .day-grid { grid-template-columns: repeat(5, 1fr); }
+  .summary-grid { grid-template-columns: repeat(5, 1fr); }
+  .summary-item .s-value { font-size: 1.1rem; }
+  .container { padding-bottom: 130px; }
+}
+
+@media print {
+  .action-bar, .toast { display: none !important; }
+  body { background: #fff; }
+  .card { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
+  .container { padding-bottom: 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast">저장됨</div>
+
+<header class="header">
+  <h1>키다리샘 학습 플래너</h1>
+  <p>학습 계획 수립 및 자기 점검</p>
+</header>
+
+<div class="container">
+
+  <!-- 이름 + 주차 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="badge" style="background:#2563eb;">기본 정보</span>
+      <h2>이름 및 주차 선택</h2>
+    </div>
+    <div class="field" style="margin-bottom:16px;">
+      <label for="sname">이름</label>
+      <input type="text" id="sname" placeholder="이름을 입력하세요">
+    </div>
+    <label class="field-label" style="font-size:.8rem;font-weight:700;color:var(--gray600);display:block;margin-bottom:6px;">주차 선택</label>
+    <div class="week-selector" id="weekSelector"></div>
+  </div>
+
+  <!-- 전체 진행률 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="badge" style="background:#16a34a;">요약</span>
+      <h2>이번 주 학습 달성률</h2>
+    </div>
+    <div class="summary-grid" id="summaryGrid">
+      <div class="summary-item"><div class="s-label">국어</div><div class="s-value s-korean" id="sum-korean">0%</div></div>
+      <div class="summary-item"><div class="s-label">영어</div><div class="s-value s-english" id="sum-english">0%</div></div>
+      <div class="summary-item"><div class="s-label">수학</div><div class="s-value s-math" id="sum-math">0%</div></div>
+      <div class="summary-item"><div class="s-label">사회</div><div class="s-value s-social" id="sum-social">0%</div></div>
+      <div class="summary-item"><div class="s-label">과학</div><div class="s-value s-science" id="sum-science">0%</div></div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-label"><span>전체 달성률</span><span id="totalPctLabel">0%</span></div>
+      <div class="progress-track"><div class="progress-fill fill-total" id="totalFill"></div></div>
+    </div>
+  </div>
+
+  <!-- 과목별 계획 & 점검 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="badge" style="background:#7c3aed;">계획 & 점검</span>
+      <h2>과목별 학습 계획 및 실천 점검</h2>
+    </div>
+    <p class="card-desc">과목 탭을 선택하고, 이번 주 학습 목표와 매일 실천 여부를 체크하세요.</p>
+
+    <div class="subject-tabs">
+      <button class="subject-tab tab-korean active" onclick="switchSubject('korean')">국어</button>
+      <button class="subject-tab tab-english" onclick="switchSubject('english')">영어</button>
+      <button class="subject-tab tab-math" onclick="switchSubject('math')">수학</button>
+      <button class="subject-tab tab-social" onclick="switchSubject('social')">사회</button>
+      <button class="subject-tab tab-science" onclick="switchSubject('science')">과학</button>
+    </div>
+
+    <!-- 국어 -->
+    <div class="subject-panel active" id="panel-korean">
+      <div class="plan-section">
+        <h3>&#x1F4D6; 이번 주 학습 목표</h3>
+        <div class="field">
+          <label>무엇을 공부할 건가요?</label>
+          <textarea class="save-field" data-key="korean-goal" placeholder="예: 비문학 독해 연습, 문법 정리 등"></textarea>
+        </div>
+        <div class="field">
+          <label>구체적인 실천 방법</label>
+          <textarea class="save-field" data-key="korean-method" placeholder="예: 매일 비문학 지문 1개 풀기, 틀린 문제 오답 정리"></textarea>
+        </div>
+      </div>
+      <div class="plan-section">
+        <h3>&#x2705; 매일 실천 체크</h3>
+        <div class="day-grid" id="days-korean">
+          <div class="day-box" onclick="toggleDay('korean',0)"><div class="day-label">월</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('korean',1)"><div class="day-label">화</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('korean',2)"><div class="day-label">수</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('korean',3)"><div class="day-label">목</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('korean',4)"><div class="day-label">금</div><div class="day-check"></div></div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-label"><span>국어 달성률</span><span id="pct-korean">0%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-blue" id="fill-korean"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 영어 -->
+    <div class="subject-panel" id="panel-english">
+      <div class="plan-section">
+        <h3>&#x1F4D6; 이번 주 학습 목표</h3>
+        <div class="field">
+          <label>무엇을 공부할 건가요?</label>
+          <textarea class="save-field" data-key="english-goal" placeholder="예: 교과서 본문 해석, 단어 암기 등"></textarea>
+        </div>
+        <div class="field">
+          <label>구체적인 실천 방법</label>
+          <textarea class="save-field" data-key="english-method" placeholder="예: 매일 단어 20개 암기, 본문 1과 해석"></textarea>
+        </div>
+      </div>
+      <div class="plan-section">
+        <h3>&#x2705; 매일 실천 체크</h3>
+        <div class="day-grid" id="days-english">
+          <div class="day-box" onclick="toggleDay('english',0)"><div class="day-label">월</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('english',1)"><div class="day-label">화</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('english',2)"><div class="day-label">수</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('english',3)"><div class="day-label">목</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('english',4)"><div class="day-label">금</div><div class="day-check"></div></div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-label"><span>영어 달성률</span><span id="pct-english">0%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-purple" id="fill-english"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 수학 -->
+    <div class="subject-panel" id="panel-math">
+      <div class="plan-section">
+        <h3>&#x1F4D6; 이번 주 학습 목표</h3>
+        <div class="field">
+          <label>무엇을 공부할 건가요?</label>
+          <textarea class="save-field" data-key="math-goal" placeholder="예: 이차방정식 문제 풀이, 개념 복습 등"></textarea>
+        </div>
+        <div class="field">
+          <label>구체적인 실천 방법</label>
+          <textarea class="save-field" data-key="math-method" placeholder="예: 매일 수학 문제집 2페이지 풀기, 오답 노트 작성"></textarea>
+        </div>
+      </div>
+      <div class="plan-section">
+        <h3>&#x2705; 매일 실천 체크</h3>
+        <div class="day-grid" id="days-math">
+          <div class="day-box" onclick="toggleDay('math',0)"><div class="day-label">월</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('math',1)"><div class="day-label">화</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('math',2)"><div class="day-label">수</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('math',3)"><div class="day-label">목</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('math',4)"><div class="day-label">금</div><div class="day-check"></div></div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-label"><span>수학 달성률</span><span id="pct-math">0%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-orange" id="fill-math"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 사회 -->
+    <div class="subject-panel" id="panel-social">
+      <div class="plan-section">
+        <h3>&#x1F4D6; 이번 주 학습 목표</h3>
+        <div class="field">
+          <label>무엇을 공부할 건가요?</label>
+          <textarea class="save-field" data-key="social-goal" placeholder="예: 단원 정리, 주요 개념 노트 작성 등"></textarea>
+        </div>
+        <div class="field">
+          <label>구체적인 실천 방법</label>
+          <textarea class="save-field" data-key="social-method" placeholder="예: 교과서 한 단원 요약 정리, 핵심 키워드 암기"></textarea>
+        </div>
+      </div>
+      <div class="plan-section">
+        <h3>&#x2705; 매일 실천 체크</h3>
+        <div class="day-grid" id="days-social">
+          <div class="day-box" onclick="toggleDay('social',0)"><div class="day-label">월</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('social',1)"><div class="day-label">화</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('social',2)"><div class="day-label">수</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('social',3)"><div class="day-label">목</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('social',4)"><div class="day-label">금</div><div class="day-check"></div></div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-label"><span>사회 달성률</span><span id="pct-social">0%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-green" id="fill-social"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 과학 -->
+    <div class="subject-panel" id="panel-science">
+      <div class="plan-section">
+        <h3>&#x1F4D6; 이번 주 학습 목표</h3>
+        <div class="field">
+          <label>무엇을 공부할 건가요?</label>
+          <textarea class="save-field" data-key="science-goal" placeholder="예: 실험 보고서 정리, 단원 개념 복습 등"></textarea>
+        </div>
+        <div class="field">
+          <label>구체적인 실천 방법</label>
+          <textarea class="save-field" data-key="science-method" placeholder="예: 교과서 읽고 핵심 정리, 탐구 문제 풀기"></textarea>
+        </div>
+      </div>
+      <div class="plan-section">
+        <h3>&#x2705; 매일 실천 체크</h3>
+        <div class="day-grid" id="days-science">
+          <div class="day-box" onclick="toggleDay('science',0)"><div class="day-label">월</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('science',1)"><div class="day-label">화</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('science',2)"><div class="day-label">수</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('science',3)"><div class="day-label">목</div><div class="day-check"></div></div>
+          <div class="day-box" onclick="toggleDay('science',4)"><div class="day-label">금</div><div class="day-check"></div></div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-label"><span>과학 달성률</span><span id="pct-science">0%</span></div>
+          <div class="progress-track"><div class="progress-fill fill-cyan" id="fill-science"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 주간 성찰 -->
+  <div class="card">
+    <div class="card-head">
+      <span class="badge" style="background:#854d0e;">성찰</span>
+      <h2>이번 주 돌아보기</h2>
+    </div>
+    <div class="reflect-box">
+      <h3>&#x1F4AD; 주간 성찰 일지</h3>
+      <div class="field">
+        <label>이번 주 잘한 점</label>
+        <textarea class="save-field" data-key="reflect-good" placeholder="이번 주 스스로 칭찬해줄 수 있는 점은?"></textarea>
+      </div>
+      <div class="field">
+        <label>아쉬운 점 / 개선할 점</label>
+        <textarea class="save-field" data-key="reflect-improve" placeholder="다음 주에 더 노력할 부분은?"></textarea>
+      </div>
+      <div class="field">
+        <label>다음 주 다짐 한마디</label>
+        <textarea class="save-field" data-key="reflect-next" placeholder="다음 주를 위한 나만의 다짐!"></textarea>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 하단 바 -->
+<div class="action-bar">
+  <button class="btn btn-gray" onclick="resetWeek()">이번 주 초기화</button>
+  <button class="btn btn-blue" onclick="window.print()">인쇄 / PDF</button>
+  <button class="btn btn-submit" onclick="submitData()">제출하기</button>
+</div>
+
+<script>
+const SUBJECTS = ['korean','english','math','social','science'];
+const SUBJECT_NAMES = { korean:'국어', english:'영어', math:'수학', social:'사회', science:'과학' };
+
+var WEEKS = [
+  { name: '4월 4주', date: '4/20~26', key: 'apr4' },
+  { name: '4월 5주', date: '4/27~5/3', key: 'apr5' },
+  { name: '5월 1주', date: '5/4~10', key: 'may1' },
+  { name: '5월 2주', date: '5/11~17', key: 'may2' },
+  { name: '5월 3주', date: '5/18~24', key: 'may3' },
+  { name: '5월 4주', date: '5/25~31', key: 'may4' },
+  { name: '6월 1주', date: '6/1~7', key: 'jun1' },
+  { name: '6월 2주', date: '6/8~14', key: 'jun2' },
+  { name: '6월 3주', date: '6/15~21', key: 'jun3' },
+  { name: '6월 4주', date: '6/22~28', key: 'jun4' },
+  { name: '7월 1주', date: '6/29~7/5', key: 'jul1' }
+];
+
+let currentWeek = 0;
+let data = {};
+
+/* ── 주차 버튼 생성 ── */
+function initWeeks() {
+  var wrap = document.getElementById('weekSelector');
+  wrap.innerHTML = '';
+  WEEKS.forEach(function(w, i) {
+    var btn = document.createElement('button');
+    btn.className = 'week-btn' + (i === currentWeek ? ' active' : '');
+    btn.innerHTML = '<span class="wk-name">' + w.name + '</span><span class="wk-date">' + w.date + '</span>';
+    btn.onclick = function() { switchWeek(i); };
+    wrap.appendChild(btn);
+  });
+}
+
+function switchWeek(idx) {
+  saveCurrentWeek();
+  currentWeek = idx;
+  document.querySelectorAll('.week-btn').forEach(function(b, i) {
+    b.classList.toggle('active', i === idx);
+  });
+  loadCurrentWeek();
+  updateAllProgress();
+}
+
+/* ── 과목 탭 전환 ── */
+function switchSubject(subj) {
+  document.querySelectorAll('.subject-tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelector('.tab-' + subj).classList.add('active');
+  document.querySelectorAll('.subject-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('panel-' + subj).classList.add('active');
+}
+
+/* ── 요일 체크 토글 ── */
+function toggleDay(subj, dayIdx) {
+  var boxes = document.getElementById('days-' + subj).querySelectorAll('.day-box');
+  var box = boxes[dayIdx];
+  box.classList.toggle('checked');
+  if (box.classList.contains('checked')) {
+    box.querySelector('.day-check').textContent = '\u2714';
+  } else {
+    box.querySelector('.day-check').textContent = '';
+  }
+  updateSubjectProgress(subj);
+  saveCurrentWeek();
+  showToast();
+}
+
+/* ── 진행률 업데이트 ── */
+function updateSubjectProgress(subj) {
+  var boxes = document.getElementById('days-' + subj).querySelectorAll('.day-box');
+  var checked = 0;
+  boxes.forEach(function(b) { if (b.classList.contains('checked')) checked++; });
+  var pct = Math.round(checked / 5 * 100);
+  document.getElementById('pct-' + subj).textContent = pct + '%';
+  document.getElementById('fill-' + subj).style.width = pct + '%';
+  document.getElementById('sum-' + subj).textContent = pct + '%';
+  updateTotalProgress();
+}
+
+function updateAllProgress() {
+  SUBJECTS.forEach(function(s) { updateSubjectProgress(s); });
+}
+
+function updateTotalProgress() {
+  var total = 0;
+  SUBJECTS.forEach(function(s) {
+    var boxes = document.getElementById('days-' + s).querySelectorAll('.day-box');
+    boxes.forEach(function(b) { if (b.classList.contains('checked')) total++; });
+  });
+  var pct = Math.round(total / 25 * 100);
+  document.getElementById('totalPctLabel').textContent = pct + '%';
+  document.getElementById('totalFill').style.width = pct + '%';
+}
+
+/* ── 저장 / 불러오기 ── */
+function getKey() {
+  return 'planner_' + WEEKS[currentWeek].key;
+}
+
+function saveCurrentWeek() {
+  var d = {};
+  d.name = document.getElementById('sname').value;
+
+  // 텍스트 필드
+  document.querySelectorAll('.save-field').forEach(function(el) {
+    d[el.dataset.key] = el.value;
+  });
+
+  // 요일 체크
+  SUBJECTS.forEach(function(s) {
+    var checks = [];
+    document.getElementById('days-' + s).querySelectorAll('.day-box').forEach(function(b) {
+      checks.push(b.classList.contains('checked'));
+    });
+    d['days-' + s] = checks;
+  });
+
+  localStorage.setItem(getKey(), JSON.stringify(d));
+
+  // 이름은 전역 저장
+  if (d.name) localStorage.setItem('planner_name', d.name);
+}
+
+function loadCurrentWeek() {
+  var raw = localStorage.getItem(getKey());
+  var globalName = localStorage.getItem('planner_name') || '';
+
+  // 텍스트 필드 초기화
+  document.querySelectorAll('.save-field').forEach(function(el) { el.value = ''; });
+
+  // 체크 초기화
+  SUBJECTS.forEach(function(s) {
+    document.getElementById('days-' + s).querySelectorAll('.day-box').forEach(function(b) {
+      b.classList.remove('checked');
+      b.querySelector('.day-check').textContent = '';
+    });
+  });
+
+  if (!raw) {
+    document.getElementById('sname').value = globalName;
+    return;
+  }
+
+  try {
+    var d = JSON.parse(raw);
+    document.getElementById('sname').value = d.name || globalName;
+
+    document.querySelectorAll('.save-field').forEach(function(el) {
+      if (d[el.dataset.key]) el.value = d[el.dataset.key];
+    });
+
+    SUBJECTS.forEach(function(s) {
+      var checks = d['days-' + s] || [];
+      document.getElementById('days-' + s).querySelectorAll('.day-box').forEach(function(b, i) {
+        if (checks[i]) {
+          b.classList.add('checked');
+          b.querySelector('.day-check').textContent = '\u2714';
+        }
+      });
+    });
+  } catch(e) {}
+}
+
+/* ── 자동 저장 ── */
+function bindAutoSave() {
+  document.getElementById('sname').addEventListener('input', function() { saveCurrentWeek(); showToast(); });
+  document.querySelectorAll('.save-field').forEach(function(el) {
+    el.addEventListener('input', function() { saveCurrentWeek(); showToast(); });
+  });
+}
+
+/* ── 초기화 ── */
+function resetWeek() {
+  if (!confirm(WEEKS[currentWeek].name + ' (' + WEEKS[currentWeek].date + ') 내용을 모두 초기화하시겠습니까?')) return;
+  localStorage.removeItem(getKey());
+  loadCurrentWeek();
+  updateAllProgress();
+}
+
+/* ── 토스트 ── */
+function showToast() {
+  var t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(function() { t.classList.remove('show'); }, 1200);
+}
+
+/* ── 구글 시트 제출 ── */
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGtatZaN5qFm-R6u_WY41cDbcmHV2Zkc9p4xuwlzst3N7o819d8ej5Q16B_9nCHGvZ/exec';
+
+function submitData() {
+  var name = document.getElementById('sname').value.trim();
+  if (!name) { alert('이름을 입력해 주세요.'); return; }
+
+  // 과목별 데이터 수집
+  var subjects = {};
+  SUBJECTS.forEach(function(s) {
+    var goal = document.querySelector('[data-key="' + s + '-goal"]').value.trim();
+    var method = document.querySelector('[data-key="' + s + '-method"]').value.trim();
+    var days = [];
+    document.getElementById('days-' + s).querySelectorAll('.day-box').forEach(function(b) {
+      days.push(b.classList.contains('checked') ? 'O' : 'X');
+    });
+    var checked = days.filter(function(d) { return d === 'O'; }).length;
+    subjects[s] = {
+      goal: goal,
+      method: method,
+      mon: days[0], tue: days[1], wed: days[2], thu: days[3], fri: days[4],
+      pct: Math.round(checked / 5 * 100)
+    };
+  });
+
+  // 전체 달성률
+  var totalChecked = 0;
+  SUBJECTS.forEach(function(s) { totalChecked += subjects[s].pct; });
+  var totalPct = Math.round(totalChecked / 5);
+
+  var weekInfo = WEEKS[currentWeek];
+  var payload = {
+    name: name,
+    week: weekInfo.name + ' (' + weekInfo.date + ')',
+    korean: subjects.korean,
+    english: subjects.english,
+    math: subjects.math,
+    social: subjects.social,
+    science: subjects.science,
+    totalPct: totalPct,
+    reflectGood: document.querySelector('[data-key="reflect-good"]').value.trim(),
+    reflectImprove: document.querySelector('[data-key="reflect-improve"]').value.trim(),
+    reflectNext: document.querySelector('[data-key="reflect-next"]').value.trim()
+  };
+
+  if (!SCRIPT_URL) {
+    alert('Apps Script URL이 설정되지 않았습니다.');
+    return;
+  }
+
+  var btn = document.querySelector('.btn-submit');
+  btn.disabled = true;
+  btn.textContent = '제출 중...';
+
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
+  }).then(function() {
+    btn.textContent = '제출 완료!';
+    setTimeout(function() {
+      btn.disabled = false;
+      btn.textContent = '제출하기';
+    }, 2000);
+  }).catch(function() {
+    alert('제출 중 오류가 발생했습니다. 다시 시도해 주세요.');
+    btn.disabled = false;
+    btn.textContent = '제출하기';
+  });
+}
+
+/* ── 초기화 ── */
+document.addEventListener('DOMContentLoaded', function() {
+  initWeeks();
+  loadCurrentWeek();
+  bindAutoSave();
+  updateAllProgress();
+});
+</script>
+</body>
+</html>
