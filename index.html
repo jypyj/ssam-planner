@@ -146,7 +146,7 @@ body {
 /* ── 과목 탭 ── */
 .subject-tabs {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 6px;
   margin-bottom: 16px;
 }
@@ -169,7 +169,6 @@ body {
 .tab-math.active { background: #ea580c; border-color: #ea580c; }
 .tab-social.active { background: #16a34a; border-color: #16a34a; }
 .tab-science.active { background: #0891b2; border-color: #0891b2; }
-.tab-history.active { background: #b91c1c; border-color: #b91c1c; }
 
 /* ── 과목 패널 ── */
 .subject-panel { display: none; animation: fadeIn .3s ease; }
@@ -257,13 +256,12 @@ body {
 .fill-orange { background: linear-gradient(90deg, #ea580c, #f97316); }
 .fill-green { background: linear-gradient(90deg, #16a34a, #4ade80); }
 .fill-cyan { background: linear-gradient(90deg, #0891b2, #22d3ee); }
-.fill-red { background: linear-gradient(90deg, #b91c1c, #ef4444); }
 .fill-total { background: linear-gradient(90deg, #1e3a8a, #2563eb, #16a34a); }
 
 /* ── 전체 요약 ── */
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
   margin-bottom: 16px;
 }
@@ -281,7 +279,6 @@ body {
 .s-math { color: #ea580c; }
 .s-social { color: #16a34a; }
 .s-science { color: #0891b2; }
-.s-history { color: #b91c1c; }
 
 /* ── 성찰 ── */
 .reflect-box {
@@ -343,9 +340,9 @@ body {
 /* ── 반응형 ── */
 @media (max-width: 600px) {
   .week-selector { grid-template-columns: repeat(3, 1fr); }
-  .subject-tabs { grid-template-columns: repeat(6, 1fr); font-size: .72rem; }
+  .subject-tabs { grid-template-columns: repeat(5, 1fr); font-size: .75rem; }
   .day-grid { grid-template-columns: repeat(5, 1fr); }
-  .summary-grid { grid-template-columns: repeat(6, 1fr); }
+  .summary-grid { grid-template-columns: repeat(5, 1fr); }
   .summary-item .s-value { font-size: 1.1rem; }
   .container { padding-bottom: 130px; }
 }
@@ -400,7 +397,6 @@ body {
       <div class="summary-item"><div class="s-label">수학</div><div class="s-value s-math" id="sum-math">0%</div></div>
       <div class="summary-item"><div class="s-label">사회</div><div class="s-value s-social" id="sum-social">0%</div></div>
       <div class="summary-item"><div class="s-label">과학</div><div class="s-value s-science" id="sum-science">0%</div></div>
-      <div class="summary-item"><div class="s-label">한국사</div><div class="s-value s-history" id="sum-history">0%</div></div>
     </div>
     <div class="progress-bar-wrap">
       <div class="progress-label"><span>전체 달성률</span><span id="totalPctLabel">0%</span></div>
@@ -422,7 +418,6 @@ body {
       <button class="subject-tab tab-math" onclick="switchSubject('math')">수학</button>
       <button class="subject-tab tab-social" onclick="switchSubject('social')">사회</button>
       <button class="subject-tab tab-science" onclick="switchSubject('science')">과학</button>
-      <button class="subject-tab tab-history" onclick="switchSubject('history')">한국사</button>
     </div>
 
     <!-- 국어 -->
@@ -569,35 +564,6 @@ body {
         </div>
       </div>
     </div>
-
-    <!-- 한국사 -->
-    <div class="subject-panel" id="panel-history">
-      <div class="plan-section">
-        <h3>&#x1F4D6; 이번 주 학습 목표</h3>
-        <div class="field">
-          <label>무엇을 공부할 건가요?</label>
-          <textarea class="save-field" data-key="history-goal" placeholder="예: 시대별 흐름 정리, 주요 사건 암기 등"></textarea>
-        </div>
-        <div class="field">
-          <label>구체적인 실천 방법</label>
-          <textarea class="save-field" data-key="history-method" placeholder="예: 교과서 한 단원 읽고 연표 정리, 기출문제 풀기"></textarea>
-        </div>
-      </div>
-      <div class="plan-section">
-        <h3>&#x2705; 매일 실천 체크</h3>
-        <div class="day-grid" id="days-history">
-          <div class="day-box" onclick="toggleDay('history',0)"><div class="day-label">월</div><div class="day-check"></div></div>
-          <div class="day-box" onclick="toggleDay('history',1)"><div class="day-label">화</div><div class="day-check"></div></div>
-          <div class="day-box" onclick="toggleDay('history',2)"><div class="day-label">수</div><div class="day-check"></div></div>
-          <div class="day-box" onclick="toggleDay('history',3)"><div class="day-label">목</div><div class="day-check"></div></div>
-          <div class="day-box" onclick="toggleDay('history',4)"><div class="day-label">금</div><div class="day-check"></div></div>
-        </div>
-        <div class="progress-bar-wrap">
-          <div class="progress-label"><span>한국사 달성률</span><span id="pct-history">0%</span></div>
-          <div class="progress-track"><div class="progress-fill fill-red" id="fill-history"></div></div>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- 주간 성찰 -->
@@ -633,10 +599,13 @@ body {
 </div>
 
 <script>
-const SUBJECTS = ['korean','english','math','social','science','history'];
-const SUBJECT_NAMES = { korean:'국어', english:'영어', math:'수학', social:'사회', science:'과학', history:'한국사' };
+const SUBJECTS = ['korean','english','math','social','science'];
+const SUBJECT_NAMES = { korean:'국어', english:'영어', math:'수학', social:'사회', science:'과학' };
 
 var WEEKS = [
+  { name: '4월 4주', date: '4/20~26', key: 'apr4' },
+  { name: '4월 5주', date: '4/27~5/3', key: 'apr5' },
+  { name: '5월 1주', date: '5/4~10', key: 'may1' },
   { name: '5월 2주', date: '5/11~17', key: 'may2' },
   { name: '5월 3주', date: '5/18~24', key: 'may3' },
   { name: '5월 4주', date: '5/25~31', key: 'may4' },
@@ -718,7 +687,7 @@ function updateTotalProgress() {
     var boxes = document.getElementById('days-' + s).querySelectorAll('.day-box');
     boxes.forEach(function(b) { if (b.classList.contains('checked')) total++; });
   });
-  var pct = Math.round(total / 30 * 100);
+  var pct = Math.round(total / 25 * 100);
   document.getElementById('totalPctLabel').textContent = pct + '%';
   document.getElementById('totalFill').style.width = pct + '%';
 }
@@ -817,7 +786,7 @@ function showToast() {
 }
 
 /* ── 구글 시트 제출 ── */
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxVRd769T1ICoTfEktsia87dk24j8j-paaD78QdhZnNwOWi-c9747vrn00vrWDOK-mV/exec';
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGtatZaN5qFm-R6u_WY41cDbcmHV2Zkc9p4xuwlzst3N7o819d8ej5Q16B_9nCHGvZ/exec';
 
 function submitData() {
   var name = document.getElementById('sname').value.trim();
@@ -844,7 +813,7 @@ function submitData() {
   // 전체 달성률
   var totalChecked = 0;
   SUBJECTS.forEach(function(s) { totalChecked += subjects[s].pct; });
-  var totalPct = Math.round(totalChecked / 6);
+  var totalPct = Math.round(totalChecked / 5);
 
   var weekInfo = WEEKS[currentWeek];
   var payload = {
@@ -855,7 +824,6 @@ function submitData() {
     math: subjects.math,
     social: subjects.social,
     science: subjects.science,
-    history: subjects.history,
     totalPct: totalPct,
     reflectGood: document.querySelector('[data-key="reflect-good"]').value.trim(),
     reflectImprove: document.querySelector('[data-key="reflect-improve"]').value.trim(),
